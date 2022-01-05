@@ -21,8 +21,9 @@
 #define DENALI_CTL_DATA ddr_ctl_settings
 #include "ddrregs.h"
 
-#define DDR_SIZE  (8UL * 1024UL * 1024UL * 1024UL)
-#define DDRCTLPLL_F 55
+#define DDR_SIZE  (16UL * 1024UL * 1024UL * 1024UL)
+// 923 MHz, 1846MT
+#define DDRCTLPLL_F 70
 #define DDRCTLPLL_Q 2
 
 #include <sifive/platform.h>
@@ -113,7 +114,7 @@ void update_peripheral_clock_dividers(unsigned int peripheral_input_khz)
   }
 }
 
-long nsec_per_cyc = 300; // 33.333MHz
+long nsec_per_cyc = 1; // 1GHz, 20% diff from 1.2GHz
 void nsleep(long nsec) {
   long step = nsec_per_cyc*2; // 2 instructions per loop iteration
   while (nsec > 0) nsec -= step;
@@ -133,67 +134,55 @@ int main(int id, unsigned long dtb)
   // Initialize UART divider for 33MHz core clock in case if trap is taken prior
   // to core clock bump.
   unsigned long long uart_target_hz = 115200ULL;
-  const uint32_t initial_core_clk_khz = 33000;
+  const uint32_t initial_core_clk_khz = 26000;
   unsigned long peripheral_input_khz;
-  if (UX00PRCI_REG(UX00PRCI_CLKMUXSTATUSREG) & CLKMUX_STATUS_TLCLKSEL){
-    peripheral_input_khz = initial_core_clk_khz;
-  } else {
-    peripheral_input_khz = initial_core_clk_khz / 2;
-  }
+
+  peripheral_input_khz = initial_core_clk_khz / 2;
+
   UART0_REG(UART_REG_DIV) = uart_min_clk_divisor(peripheral_input_khz * 1000ULL, uart_target_hz);
 
-  // Check Reset Values (lock don't care)
-  uint32_t pll_default =
-    (PLL_R(PLL_R_default)) |
-    (PLL_F(PLL_F_default)) |
-    (PLL_Q(PLL_Q_default)) |
-    (PLL_RANGE(PLL_RANGE_default)) |
-    (PLL_BYPASS(PLL_BYPASS_default)) |
-    (PLL_FSE(PLL_FSE_default));
-  uint32_t lockmask = ~PLL_LOCK(1);
-  uint32_t pllout_default =
-    (PLLOUT_DIV(PLLOUT_DIV_default)) |
-    (PLLOUT_DIV_BY_1(PLLOUT_DIV_BY_1_default)) |
-    (PLLOUT_CLK_EN(PLLOUT_CLK_EN_default));
-
-  if ((UX00PRCI_REG(UX00PRCI_COREPLLCFG)     ^ pll_default) & lockmask) return (__LINE__);
-  if ((UX00PRCI_REG(UX00PRCI_COREPLLOUT)     ^ pllout_default))         return (__LINE__);
-  if ((UX00PRCI_REG(UX00PRCI_DDRPLLCFG)      ^ pll_default) & lockmask) return (__LINE__);
-  if ((UX00PRCI_REG(UX00PRCI_DDRPLLOUT)      ^ pllout_default))         return (__LINE__);
-  if (((UX00PRCI_REG(UX00PRCI_GEMGXLPLLCFG)) ^ pll_default) & lockmask) return (__LINE__);
-  if (((UX00PRCI_REG(UX00PRCI_GEMGXLPLLOUT)) ^ pllout_default))         return (__LINE__);
-
-  //CORE pll init
-  // If tlclksel is set for 2:1 operation,
-  // Set corepll 33Mhz -> 1GHz
-  // Otherwise, set corepll 33MHz -> 500MHz.
-  
-  if (UX00PRCI_REG(UX00PRCI_CLKMUXSTATUSREG) & CLKMUX_STATUS_TLCLKSEL){
-    nsec_per_cyc = 2;
-    peripheral_input_khz = 500000; // peripheral_clk = tlclk
-    update_peripheral_clock_dividers(peripheral_input_khz);
-    ux00prci_select_corepll_500MHz(&UX00PRCI_REG(UX00PRCI_CORECLKSELREG),
-                                   &UX00PRCI_REG(UX00PRCI_COREPLLCFG),
-                                   &UX00PRCI_REG(UX00PRCI_COREPLLOUT));
-  } else {
-    nsec_per_cyc = 1;
-    peripheral_input_khz = (1000000 / 2); // peripheral_clk = tlclk
-    update_peripheral_clock_dividers(peripheral_input_khz);
-    
-    ux00prci_select_corepll_1GHz(&UX00PRCI_REG(UX00PRCI_CORECLKSELREG),
-                                 &UX00PRCI_REG(UX00PRCI_COREPLLCFG),
-                                 &UX00PRCI_REG(UX00PRCI_COREPLLOUT));
-  }
-  
   //
-  //DDR init
+  // core clk
+  //
+
+  ux00prci_select_corepll_1200MHz(&UX00PRCI_REG(UX00PRCI_CORECLKSELREG),
+                                  &UX00PRCI_REG(UX00PRCI_COREPLLCFG));
+
+  //
+  // hfpclk
+  //
+
+  uint32_t hfpclk250Mhz = // 250.25MHz
+    (PLL_R(0)) |
+    (PLL_F(76)) |  /*4004Mhz VCO*/
+    (PLL_Q(4)) |   /* /16 */
+    (PLL_RANGE(0x3)) |
+    (PLL_BYPASS(0)) |
+    (PLL_FSE(1));
+  UX00PRCI_REG(UX00PRCI_HFPCLKPLLCFG) = hfpclk250Mhz;
+
+  // Wait for lock
+  while ((UX00PRCI_REG(UX00PRCI_HFPCLKPLLCFG) & PLL_LOCK(1)) == 0) ;
+
+  uint32_t hfpclk_out =
+    (PLLOUT_CLK_EN(1));
+  UX00PRCI_REG(UX00PRCI_HFPCLKPLLOUT) = hfpclk_out;
+
+  UX00PRCI_REG(UX00PRCI_HFPCLKSELREG) = 0;
+  UX00PRCI_REG(UX00PRCI_HFPCLKDIVREG) = 0;
+
+  peripheral_input_khz = 250250 / 2;
+  UART0_REG(UART_REG_DIV) = uart_min_clk_divisor(peripheral_input_khz * 1000ULL, uart_target_hz);
+
+  //
+  // DDR init
   //
 
   uint32_t ddrctlmhz =
     (PLL_R(0)) |
     (PLL_F(DDRCTLPLL_F)) |
     (PLL_Q(DDRCTLPLL_Q)) |
-    (PLL_RANGE(0x4)) |
+    (PLL_RANGE(0x3)) |
     (PLL_BYPASS(0)) |
     (PLL_FSE(1));
   UX00PRCI_REG(UX00PRCI_DDRPLLCFG) = ddrctlmhz;
@@ -202,8 +191,6 @@ int main(int id, unsigned long dtb)
   while ((UX00PRCI_REG(UX00PRCI_DDRPLLCFG) & PLL_LOCK(1)) == 0) ;
 
   uint32_t ddrctl_out =
-    (PLLOUT_DIV(PLLOUT_DIV_default)) |
-    (PLLOUT_DIV_BY_1(PLLOUT_DIV_BY_1_default)) |
     (PLLOUT_CLK_EN(1));
   (UX00PRCI_REG(UX00PRCI_DDRPLLOUT)) = ddrctl_out;
 
@@ -217,11 +204,11 @@ int main(int id, unsigned long dtb)
   for (int i = 0; i < 256; i++){
     asm volatile ("nop");
   }
-  
+
   ux00ddr_writeregmap(UX00DDR_CTRL_ADDR,ddr_ctl_settings,ddr_phy_settings);
   ux00ddr_disableaxireadinterleave(UX00DDR_CTRL_ADDR);
 
-  ux00ddr_disableoptimalrmodw(UX00DDR_CTRL_ADDR);  
+  ux00ddr_disableoptimalrmodw(UX00DDR_CTRL_ADDR);
 
   ux00ddr_enablewriteleveling(UX00DDR_CTRL_ADDR);
   ux00ddr_enablereadleveling(UX00DDR_CTRL_ADDR);
@@ -240,17 +227,17 @@ int main(int id, unsigned long dtb)
   const uint64_t ddr_end = PAYLOAD_DEST + ddr_size;
   ux00ddr_start(UX00DDR_CTRL_ADDR, PHYSICAL_FILTER_CTRL_ADDR, ddr_end);
 
-  ux00ddr_phy_fixup(UX00DDR_CTRL_ADDR); 
-  
+  ux00ddr_phy_fixup(UX00DDR_CTRL_ADDR);
+
   //
   //GEMGXL init
   //
 
-  uint32_t gemgxl125mhz =
+  uint32_t gemgxl125mhz = // 125.125MHz
     (PLL_R(0)) |
-    (PLL_F(59)) |  /*4000Mhz VCO*/
+    (PLL_F(76)) |  /*4004Mhz VCO*/
     (PLL_Q(5)) |   /* /32 */
-    (PLL_RANGE(0x4)) |
+    (PLL_RANGE(0x3)) |
     (PLL_BYPASS(0)) |
     (PLL_FSE(1));
   UX00PRCI_REG(UX00PRCI_GEMGXLPLLCFG) = gemgxl125mhz;
@@ -259,8 +246,6 @@ int main(int id, unsigned long dtb)
   while ((UX00PRCI_REG(UX00PRCI_GEMGXLPLLCFG) & PLL_LOCK(1)) == 0) ;
 
   uint32_t gemgxlctl_out =
-    (PLLOUT_DIV(PLLOUT_DIV_default)) |
-    (PLLOUT_DIV_BY_1(PLLOUT_DIV_BY_1_default)) |
     (PLLOUT_CLK_EN(1));
   UX00PRCI_REG(UX00PRCI_GEMGXLPLLOUT) = gemgxlctl_out;
 
@@ -283,9 +268,6 @@ int main(int id, unsigned long dtb)
   nsleep(15000000);
 //#endif
 
-  // Procmon => core clock
-  UX00PRCI_REG(UX00PRCI_PROCMONCFG) = 0x1 << 24;
-
 #ifdef BOARD_SETUP
   asm volatile ("ebreak");
 #else
@@ -305,87 +287,25 @@ int main(int id, unsigned long dtb)
   date[1] = cdate[8];
   date[2] = cdate[9];
   date[3] = cdate[10];
-  date[5] = '0' + (month/10);
-  date[6] = '0' + (month%10);
-  date[8] = cdate[4];
+  date[5] = '0' + (month / 10);
+  date[6] = '0' + (month % 10);
+  date[8] = (cdate[4] == ' ' ? '0' : cdate[4]);
   date[9] = cdate[5];
 
   // Post the serial number and build info
   extern const char * gitid;
   UART0_REG(UART_REG_TXCTRL) = UART_TXEN;
-  
-  puts("\r\nSiFive FSBL:       ");
+
+  puts("\r\nFreedom FSBL: ");
   puts(date);
   puts("-");
   puts(gitid);
-  // If chiplink is connected and has a DTB, use that DTB instead of what we have
-  // compiled-in. This will be replaced with a real bootloader with overlays in
-  // the future
-  uint32_t *chiplink_dtb = (uint32_t*)0x2ff0000000UL;
-  if (*chiplink_dtb == 0xedfe0dd0){
-	dtb = (uintptr_t)chiplink_dtb;
-	puts("\r\nUsing Chiplink DTB");
-  } else if (own_dtb == 0xedfe0dd0){
-	dtb = (uintptr_t)&own_dtb;
-	puts("\r\nUsing FSBL DTB");
+
+  if (own_dtb == 0xedfe0dd0) {
+	  dtb = (uintptr_t)&own_dtb;
+	  puts("\r\nUsing FSBL DTB");
   }
   memcpy((void*)dtb_target, (void*)dtb, fdt_size(dtb));
-  fdt_reduce_mem(dtb_target, ddr_size); // reduce the RAM to physically present only
-  fdt_set_prop(dtb_target, "sifive,fsbl", (uint8_t*)&date[0]);
-
-#ifndef SKIP_OTP_MAC
-#define FIRST_SLOT	0xfe
-#define LAST_SLOT	0x80
-
-  unsigned int serial = ~0;
-  int serial_slot;
-  ememory_otp_power_up_sequence();
-  ememory_otp_begin_read();
-  for (serial_slot = FIRST_SLOT; serial_slot >= LAST_SLOT; serial_slot -= 2) {
-    unsigned int pos = ememory_otp_read(serial_slot);
-    unsigned int neg = ememory_otp_read(serial_slot+1);
-    serial = pos;
-    if (pos == ~neg) break; // legal serial #
-    if (pos == ~0 && neg == ~0) break; // empty slot encountered
-  }
-  ememory_otp_exit_read();
-
-  void *uart = (void*)UART0_CTRL_ADDR;
-  uart_puts(uart, "\r\nHiFive-U serial #: ");
-  uart_put_hex(uart, serial);
-
-  // Program the OTP?
-  if (serial_to_burn != ~0 && serial != serial_to_burn && serial_slot > LAST_SLOT) {
-    uart_puts(uart, "Programming serial: ");
-    uart_put_hex(uart, serial_to_burn);
-    uart_puts(uart, "\r\n");
-    ememory_otp_pgm_entry();
-    if (serial != ~0) {
-      // erase the current serial
-      uart_puts(uart, "Erasing prior serial\r\n");
-      ememory_otp_pgm_access(serial_slot,   0);
-      ememory_otp_pgm_access(serial_slot+1, 0);
-      serial_slot -= 2;
-    }
-    ememory_otp_pgm_access(serial_slot,    serial_to_burn);
-    ememory_otp_pgm_access(serial_slot+1, ~serial_to_burn);
-    ememory_otp_pgm_exit();
-    uart_puts(uart, "Resuming boot\r\n");
-    serial = serial_to_burn;
-  }
-
-  ememory_otp_power_down_sequence();
-
-  // SiFive MA-S MAC block; default to serial 0
-  unsigned char mac[6] = { 0x70, 0xb3, 0xd5, 0x92, 0xf0, 0x00 };
-  if (serial != ~0) {
-    mac[5] |= (serial >>  0) & 0xff;
-    mac[4] |= (serial >>  8) & 0xff;
-    mac[3] |= (serial >> 16) & 0xff;
-  }
-  fdt_set_prop(dtb_target, "local-mac-address", &mac[0]);
-#endif
-  uart_puts(uart, "\r\n");
 #endif
 
   puts("Loading boot payload");
@@ -395,7 +315,7 @@ int main(int id, unsigned long dtb)
   slave_main(0, dtb);
 #endif
 
-  //dead code 
+  //dead code
   return 0;
 }
 

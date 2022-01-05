@@ -62,10 +62,6 @@
 #define ERROR_CODE_SD_CARD_CMD18_CRC 0xb
 #define ERROR_CODE_SD_CARD_UNEXPECTED_ERROR 0xc
 
-// We are assuming that an error LED is connected to the GPIO pin
-#define UX00BOOT_ERROR_LED_GPIO_PIN 15
-#define UX00BOOT_ERROR_LED_GPIO_MASK (1 << 15)
-
 //==============================================================================
 // Mode Select helpers
 //==============================================================================
@@ -500,11 +496,6 @@ void ux00boot_fail(long code, int trap)
     uart_put_hex((void*) UART0_CTRL_ADDR, formatted_code >> 32);
     uart_put_hex((void*) UART0_CTRL_ADDR, formatted_code);
   }
-
-  // Turn on LED
-  atomic_fetch_or(&GPIO_REG(GPIO_OUTPUT_VAL), UX00BOOT_ERROR_LED_GPIO_MASK);
-  atomic_fetch_or(&GPIO_REG(GPIO_OUTPUT_EN), UX00BOOT_ERROR_LED_GPIO_MASK);
-  atomic_fetch_or(&GPIO_REG(GPIO_OUTPUT_XOR), UX00BOOT_ERROR_LED_GPIO_MASK);
 
   while (1);
 }

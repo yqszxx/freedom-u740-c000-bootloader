@@ -3,7 +3,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /* See the file LICENSE for further information */
 
-#define               DENALI_PHY_00_DATA 0x31706542
+#define               DENALI_PHY_00_DATA 0x01375642
 #define               DENALI_PHY_01_DATA 0x0004c008
 #define               DENALI_PHY_02_DATA 0x000000da
 #define               DENALI_PHY_03_DATA 0x00000000
@@ -11,7 +11,7 @@
 #define               DENALI_PHY_05_DATA 0x00010000
 #define               DENALI_PHY_06_DATA 0x01DDDD90
 #define               DENALI_PHY_07_DATA 0x01DDDD90
-#define               DENALI_PHY_08_DATA 0x01030000
+#define               DENALI_PHY_08_DATA 0x01030001
 #define               DENALI_PHY_09_DATA 0x01000000
 #define               DENALI_PHY_10_DATA 0x00c00000
 #define               DENALI_PHY_11_DATA 0x00000007
@@ -63,7 +63,7 @@
 #define               DENALI_PHY_57_DATA 0x00800080
 #define               DENALI_PHY_58_DATA 0x00800080
 #define               DENALI_PHY_59_DATA 0x000100da
-#define               DENALI_PHY_60_DATA 0x01000200
+#define               DENALI_PHY_60_DATA 0x01ff0010
 #define               DENALI_PHY_61_DATA 0x00000000
 #define               DENALI_PHY_62_DATA 0x00000000
 #define               DENALI_PHY_63_DATA 0x00000002
@@ -139,7 +139,7 @@
 #define              DENALI_PHY_133_DATA 0x00010000
 #define              DENALI_PHY_134_DATA 0x01DDDD90
 #define              DENALI_PHY_135_DATA 0x01DDDD90
-#define              DENALI_PHY_136_DATA 0x01030000
+#define              DENALI_PHY_136_DATA 0x01030001
 #define              DENALI_PHY_137_DATA 0x01000000
 #define              DENALI_PHY_138_DATA 0x00c00000
 #define              DENALI_PHY_139_DATA 0x00000007
@@ -191,7 +191,7 @@
 #define              DENALI_PHY_185_DATA 0x00800080
 #define              DENALI_PHY_186_DATA 0x00800080
 #define              DENALI_PHY_187_DATA 0x000100da
-#define              DENALI_PHY_188_DATA 0x01000200
+#define              DENALI_PHY_188_DATA 0x01ff0010
 #define              DENALI_PHY_189_DATA 0x00000000
 #define              DENALI_PHY_190_DATA 0x00000000
 #define              DENALI_PHY_191_DATA 0x00000002
@@ -267,7 +267,7 @@
 #define              DENALI_PHY_261_DATA 0x00010000
 #define              DENALI_PHY_262_DATA 0x01DDDD90
 #define              DENALI_PHY_263_DATA 0x01DDDD90
-#define              DENALI_PHY_264_DATA 0x01030000
+#define              DENALI_PHY_264_DATA 0x01030001
 #define              DENALI_PHY_265_DATA 0x01000000
 #define              DENALI_PHY_266_DATA 0x00c00000
 #define              DENALI_PHY_267_DATA 0x00000007
@@ -319,7 +319,7 @@
 #define              DENALI_PHY_313_DATA 0x00800080
 #define              DENALI_PHY_314_DATA 0x00800080
 #define              DENALI_PHY_315_DATA 0x000100da
-#define              DENALI_PHY_316_DATA 0x00000200
+#define              DENALI_PHY_316_DATA 0x01ff0010
 #define              DENALI_PHY_317_DATA 0x00000000
 #define              DENALI_PHY_318_DATA 0x00000000
 #define              DENALI_PHY_319_DATA 0x00000002
@@ -387,7 +387,7 @@
 #define              DENALI_PHY_381_DATA 0x00000000
 #define              DENALI_PHY_382_DATA 0x00000000
 #define              DENALI_PHY_383_DATA 0x00000000
-#define              DENALI_PHY_384_DATA 0x37654120
+#define              DENALI_PHY_384_DATA 0x37651240
 #define              DENALI_PHY_385_DATA 0x0004c008
 #define              DENALI_PHY_386_DATA 0x000000da
 #define              DENALI_PHY_387_DATA 0x00000000
@@ -395,7 +395,7 @@
 #define              DENALI_PHY_389_DATA 0x00010000
 #define              DENALI_PHY_390_DATA 0x01DDDD90
 #define              DENALI_PHY_391_DATA 0x01DDDD90
-#define              DENALI_PHY_392_DATA 0x01030000
+#define              DENALI_PHY_392_DATA 0x01030001
 #define              DENALI_PHY_393_DATA 0x01000000
 #define              DENALI_PHY_394_DATA 0x00c00000
 #define              DENALI_PHY_395_DATA 0x00000007
@@ -447,7 +447,7 @@
 #define              DENALI_PHY_441_DATA 0x00800080
 #define              DENALI_PHY_442_DATA 0x00800080
 #define              DENALI_PHY_443_DATA 0x000100da
-#define              DENALI_PHY_444_DATA 0x00000200
+#define              DENALI_PHY_444_DATA 0x01ff0010
 #define              DENALI_PHY_445_DATA 0x00000000
 #define              DENALI_PHY_446_DATA 0x00000000
 #define              DENALI_PHY_447_DATA 0x00000002
@@ -515,7 +515,7 @@
 #define              DENALI_PHY_509_DATA 0x00000000
 #define              DENALI_PHY_510_DATA 0x00000000
 #define              DENALI_PHY_511_DATA 0x00000000
-#define              DENALI_PHY_512_DATA 0x24316750
+#define              DENALI_PHY_512_DATA 0x34216750
 #define              DENALI_PHY_513_DATA 0x0004c008
 #define              DENALI_PHY_514_DATA 0x000000da
 #define              DENALI_PHY_515_DATA 0x00000000
@@ -523,7 +523,7 @@
 #define              DENALI_PHY_517_DATA 0x00010000
 #define              DENALI_PHY_518_DATA 0x01DDDD90
 #define              DENALI_PHY_519_DATA 0x01DDDD90
-#define              DENALI_PHY_520_DATA 0x01030000
+#define              DENALI_PHY_520_DATA 0x01030001
 #define              DENALI_PHY_521_DATA 0x01000000
 #define              DENALI_PHY_522_DATA 0x00c00000
 #define              DENALI_PHY_523_DATA 0x00000007
@@ -575,7 +575,7 @@
 #define              DENALI_PHY_569_DATA 0x00800080
 #define              DENALI_PHY_570_DATA 0x00800080
 #define              DENALI_PHY_571_DATA 0x000100da
-#define              DENALI_PHY_572_DATA 0x00000200
+#define              DENALI_PHY_572_DATA 0x01ff0010
 #define              DENALI_PHY_573_DATA 0x00000000
 #define              DENALI_PHY_574_DATA 0x00000000
 #define              DENALI_PHY_575_DATA 0x00000002
@@ -643,7 +643,7 @@
 #define              DENALI_PHY_637_DATA 0x00000000
 #define              DENALI_PHY_638_DATA 0x00000000
 #define              DENALI_PHY_639_DATA 0x00000000
-#define              DENALI_PHY_640_DATA 0x35174620
+#define              DENALI_PHY_640_DATA 0x35176402
 #define              DENALI_PHY_641_DATA 0x0004c008
 #define              DENALI_PHY_642_DATA 0x000000da
 #define              DENALI_PHY_643_DATA 0x00000000
@@ -651,7 +651,7 @@
 #define              DENALI_PHY_645_DATA 0x00010000
 #define              DENALI_PHY_646_DATA 0x01DDDD90
 #define              DENALI_PHY_647_DATA 0x01DDDD90
-#define              DENALI_PHY_648_DATA 0x01030000
+#define              DENALI_PHY_648_DATA 0x01030001
 #define              DENALI_PHY_649_DATA 0x01000000
 #define              DENALI_PHY_650_DATA 0x00c00000
 #define              DENALI_PHY_651_DATA 0x00000007
@@ -703,7 +703,7 @@
 #define              DENALI_PHY_697_DATA 0x00800080
 #define              DENALI_PHY_698_DATA 0x00800080
 #define              DENALI_PHY_699_DATA 0x000100da
-#define              DENALI_PHY_700_DATA 0x00000200
+#define              DENALI_PHY_700_DATA 0x01ff0010
 #define              DENALI_PHY_701_DATA 0x00000000
 #define              DENALI_PHY_702_DATA 0x00000000
 #define              DENALI_PHY_703_DATA 0x00000002
@@ -771,7 +771,7 @@
 #define              DENALI_PHY_765_DATA 0x00000000
 #define              DENALI_PHY_766_DATA 0x00000000
 #define              DENALI_PHY_767_DATA 0x00000000
-#define              DENALI_PHY_768_DATA 0x15203476
+#define              DENALI_PHY_768_DATA 0x10526347
 #define              DENALI_PHY_769_DATA 0x0004c008
 #define              DENALI_PHY_770_DATA 0x000000da
 #define              DENALI_PHY_771_DATA 0x00000000
@@ -779,7 +779,7 @@
 #define              DENALI_PHY_773_DATA 0x00010000
 #define              DENALI_PHY_774_DATA 0x01DDDD90
 #define              DENALI_PHY_775_DATA 0x01DDDD90
-#define              DENALI_PHY_776_DATA 0x01030000
+#define              DENALI_PHY_776_DATA 0x01030001
 #define              DENALI_PHY_777_DATA 0x01000000
 #define              DENALI_PHY_778_DATA 0x00c00000
 #define              DENALI_PHY_779_DATA 0x00000007
@@ -831,7 +831,7 @@
 #define              DENALI_PHY_825_DATA 0x00800080
 #define              DENALI_PHY_826_DATA 0x00800080
 #define              DENALI_PHY_827_DATA 0x000100da
-#define              DENALI_PHY_828_DATA 0x00000200
+#define              DENALI_PHY_828_DATA 0x01ff0010
 #define              DENALI_PHY_829_DATA 0x00000000
 #define              DENALI_PHY_830_DATA 0x00000000
 #define              DENALI_PHY_831_DATA 0x00000002
@@ -899,7 +899,7 @@
 #define              DENALI_PHY_893_DATA 0x00000000
 #define              DENALI_PHY_894_DATA 0x00000000
 #define              DENALI_PHY_895_DATA 0x00000000
-#define              DENALI_PHY_896_DATA 0x41753206
+#define              DENALI_PHY_896_DATA 0x41753260
 #define              DENALI_PHY_897_DATA 0x0004c008
 #define              DENALI_PHY_898_DATA 0x000000da
 #define              DENALI_PHY_899_DATA 0x00000000
@@ -907,7 +907,7 @@
 #define              DENALI_PHY_901_DATA 0x00010000
 #define              DENALI_PHY_902_DATA 0x01DDDD90
 #define              DENALI_PHY_903_DATA 0x01DDDD90
-#define              DENALI_PHY_904_DATA 0x01030000
+#define              DENALI_PHY_904_DATA 0x01030001
 #define              DENALI_PHY_905_DATA 0x01000000
 #define              DENALI_PHY_906_DATA 0x00c00000
 #define              DENALI_PHY_907_DATA 0x00000007
@@ -959,7 +959,7 @@
 #define              DENALI_PHY_953_DATA 0x00800080
 #define              DENALI_PHY_954_DATA 0x00800080
 #define              DENALI_PHY_955_DATA 0x000100da
-#define              DENALI_PHY_956_DATA 0x00000200
+#define              DENALI_PHY_956_DATA 0x01ff0010
 #define              DENALI_PHY_957_DATA 0x00000000
 #define              DENALI_PHY_958_DATA 0x00000000
 #define              DENALI_PHY_959_DATA 0x00000002
@@ -1027,15 +1027,15 @@
 #define             DENALI_PHY_1021_DATA 0x00000000
 #define             DENALI_PHY_1022_DATA 0x00000000
 #define             DENALI_PHY_1023_DATA 0x00000000
-#define             DENALI_PHY_1024_DATA 0x36025174
+#define             DENALI_PHY_1024_DATA 0x76543210
 #define             DENALI_PHY_1025_DATA 0x0004c008
 #define             DENALI_PHY_1026_DATA 0x000000da
 #define             DENALI_PHY_1027_DATA 0x00000000
 #define             DENALI_PHY_1028_DATA 0x00000000
 #define             DENALI_PHY_1029_DATA 0x00010000
-#define             DENALI_PHY_1030_DATA 0x01DDDD90
-#define             DENALI_PHY_1031_DATA 0x01DDDD90
-#define             DENALI_PHY_1032_DATA 0x01030000
+#define             DENALI_PHY_1030_DATA 0x01665555
+#define             DENALI_PHY_1031_DATA 0x01665555
+#define             DENALI_PHY_1032_DATA 0x01030001
 #define             DENALI_PHY_1033_DATA 0x01000000
 #define             DENALI_PHY_1034_DATA 0x00c00000
 #define             DENALI_PHY_1035_DATA 0x00000007
@@ -1087,7 +1087,7 @@
 #define             DENALI_PHY_1081_DATA 0x00800080
 #define             DENALI_PHY_1082_DATA 0x00800080
 #define             DENALI_PHY_1083_DATA 0x000100da
-#define             DENALI_PHY_1084_DATA 0x00000200
+#define             DENALI_PHY_1084_DATA 0x01ff0010
 #define             DENALI_PHY_1085_DATA 0x00000000
 #define             DENALI_PHY_1086_DATA 0x00000000
 #define             DENALI_PHY_1087_DATA 0x00000002
@@ -1170,7 +1170,7 @@
 #define             DENALI_PHY_1164_DATA 0x00000000
 #define             DENALI_PHY_1165_DATA 0x000B1F00
 #define             DENALI_PHY_1166_DATA 0x0B1F0B1F
-#define             DENALI_PHY_1167_DATA 0x0B1F0B1B
+#define             DENALI_PHY_1167_DATA 0x0B1F0B1F
 #define             DENALI_PHY_1168_DATA 0x0B1F0B1F
 #define             DENALI_PHY_1169_DATA 0x0B1F0B1F
 #define             DENALI_PHY_1170_DATA 0x00000B00
@@ -1196,8 +1196,8 @@
 #define             DENALI_PHY_1190_DATA 0x00004410
 #define             DENALI_PHY_1191_DATA 0x00004410
 #define             DENALI_PHY_1192_DATA 0x00004410
-#define             DENALI_PHY_1193_DATA 0x00037FFF
-#define             DENALI_PHY_1194_DATA 0x00037FFF
+#define             DENALI_PHY_1193_DATA 0x00000111
+#define             DENALI_PHY_1194_DATA 0x00000111
 #define             DENALI_PHY_1195_DATA 0x00000000
 #define             DENALI_PHY_1196_DATA 0x00000000
 #define             DENALI_PHY_1197_DATA 0x00000000
