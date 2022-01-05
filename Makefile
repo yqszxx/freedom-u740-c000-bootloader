@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # See the file LICENSE for further information
 
+DTC?=dtc
 CROSSCOMPILE?=riscv64-unknown-elf-
 CC=${CROSSCOMPILE}gcc
 LD=${CROSSCOMPILE}ld
@@ -84,7 +85,7 @@ zsbl/start.o: zsbl/ux00_zsbl.dtb
 	$(OBJDUMP) -S $^ > $@
 
 %.dtb: %.dts
-	dtc -o $@ -O dtb $^
+	$(DTC) -o $@ -O dtb $^
 
 %.o: %.S
 	$(CC) $(CFLAGS) $(CCASFLAGS) -c $< -o $@
