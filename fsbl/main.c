@@ -8,8 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdatomic.h>
-#include "fdt/fdt.h"
-#include <ememoryotp/ememoryotp.h>
 #include <uart/uart.h>
 #include <stdio.h>
 
@@ -36,29 +34,11 @@
 #include <ux00boot/ux00boot.h>
 #include <gpt/gpt.h>
 
-#define NUM_CORES 5
-
 #ifndef PAYLOAD_DEST
   #define PAYLOAD_DEST MEMORY_MEM_ADDR
 #endif
 
-#ifndef SPI_MEM_ADDR
-  #ifndef SPI_NUM
-    #define SPI_NUM 0
-  #endif
-
-  #define _CONCAT3(A, B, C) A ## B ## C
-  #define _SPI_MEM_ADDR(SPI_NUM) _CONCAT3(SPI, SPI_NUM, _MEM_ADDR)
-  #define SPI_MEM_ADDR _SPI_MEM_ADDR(SPI_NUM)
-#endif
-
-Barrier barrier = { {0, 0}, {0, 0}, 0}; // bss initialization is done by main core while others do wfi
-
 extern const gpt_guid gpt_guid_sifive_bare_metal;
-volatile uint64_t dtb_target;
-unsigned int serial_to_burn = ~0;
-
-uint32_t __attribute__((weak)) own_dtb = 42; // not 0xedfe0dd0 the DTB magic
 
 static const uintptr_t i2c_devices[] = {
   I2C_CTRL_ADDR,
@@ -84,9 +64,6 @@ void handle_trap(uintptr_t sp)
   asm volatile ("nop");
   asm volatile ("nop");
 }
-
-
-int slave_main(int id, unsigned long dtb);
 
 
 /**
@@ -127,8 +104,7 @@ int puts(const char * str){
 
 //HART 0 runs main
 
-int main(int id, unsigned long dtb)
-{
+int main() {
   // PRCI init
 
   // Initialize UART divider for 33MHz core clock in case if trap is taken prior
@@ -266,15 +242,9 @@ int main(int id, unsigned long dtb)
   nsleep(100);
   atomic_fetch_or(&GPIO_REG(GPIO_OUTPUT_VAL), PHY_NRESET);
   nsleep(15000000);
-//#endif
 
-#ifdef BOARD_SETUP
-  asm volatile ("ebreak");
-#else
-  // Copy the DTB and reduce the reported memory to match DDR
-  dtb_target = ddr_end - 0x200000; // - 2MB
-#ifndef SKIP_DTB_DDR_RANGE
-#define DEQ(mon, x) ((cdate[0] == mon[0] && cdate[1] == mon[1] && cdate[2] == mon[2]) ? x : 0)
+
+#define DEQ(mon, x) ((cdate[0] == (mon)[0] && cdate[1] == (mon)[1] && cdate[2] == (mon)[2]) ? (x) : 0)
 
   const char *cdate = __DATE__;
   int month =
@@ -301,53 +271,15 @@ int main(int id, unsigned long dtb)
   puts("-");
   puts(gitid);
 
-  if (own_dtb == 0xedfe0dd0) {
-	  dtb = (uintptr_t)&own_dtb;
-	  puts("\r\nUsing FSBL DTB");
-  }
-  memcpy((void*)dtb_target, (void*)dtb, fdt_size(dtb));
-#endif
-
   puts("Loading boot payload");
   ux00boot_load_gpt_partition((void*) PAYLOAD_DEST, &gpt_guid_sifive_bare_metal, peripheral_input_khz);
 
   puts("\r\n\n");
-  slave_main(0, dtb);
-#endif
+
+  write_csr(mtvec,PAYLOAD_DEST);
+  asm volatile ("unimp");
 
   //dead code
   return 0;
 }
 
-
-/*
-  HARTs 1..5 run slave_main
-  slave_main is a weak symbol in crt.S
-*/
-
-int slave_main(int id, unsigned long dtb)
-{
-#ifdef BOARD_SETUP
-  while (1)
-    ;
-#else
-  // Wait for the DTB location to become known
-  while (!dtb_target) {}
-
-  //wait on barrier, disable sideband then trap to payload at PAYLOAD_DEST
-  write_csr(mtvec,PAYLOAD_DEST);
-
-  register int a0 asm("a0") = id;
-#ifdef SKIP_DTB_DDR_RANGE
-  register unsigned long a1 asm("a1") = dtb;
-#else
-  register unsigned long a1 asm("a1") = dtb_target;
-#endif
-  // These next two guys must get inlined and not spill a0+a1 or it is broken!
-  Barrier_Wait(&barrier, NUM_CORES);
-  ccache_enable_ways(CCACHE_CTRL_ADDR,14);
-  asm volatile ("unimp" : : "r"(a0), "r"(a1));
-#endif
-
-  return 0;
-}
