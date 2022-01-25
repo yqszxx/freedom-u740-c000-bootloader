@@ -271,7 +271,7 @@ int main() {
   puts("-");
   puts(gitid);
 
-  puts("Loading boot payload");
+  puts("\r\nLoading boot payload");
   ux00boot_load_gpt_partition((void*) PAYLOAD_DEST, &gpt_guid_sifive_bare_metal, peripheral_input_khz);
 
   puts("\r\n\n");
