@@ -276,6 +276,8 @@ int main() {
 
   puts("\r\n\n");
 
+  ccache_enable_ways(CCACHE_CTRL_ADDR,14);
+
   write_csr(mtvec,PAYLOAD_DEST);
   asm volatile ("unimp");
 
