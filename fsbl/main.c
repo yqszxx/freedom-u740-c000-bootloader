@@ -276,12 +276,26 @@ int main() {
 
   puts("\r\n\n");
 
-  ccache_enable_ways(CCACHE_CTRL_ADDR,14);
-
-  write_csr(mtvec,PAYLOAD_DEST);
-  asm volatile ("unimp");
+  slave_main();
 
   //dead code
   return 0;
 }
 
+#define NUM_CORES 5
+Barrier barrier = { {0, 0}, {0, 0}, 0}; // bss initialization is done by main core while others do wfi
+
+/*
+  HARTs 1..5 run slave_main
+  slave_main is a weak symbol in crt.S
+*/
+int slave_main() {
+  //wait on barrier, disable sideband then trap to payload at PAYLOAD_DEST
+  write_csr(mtvec,PAYLOAD_DEST);
+
+  Barrier_Wait(&barrier, NUM_CORES);
+  ccache_enable_ways(CCACHE_CTRL_ADDR,14);
+  asm volatile ("unimp");
+
+  return 0;
+}
